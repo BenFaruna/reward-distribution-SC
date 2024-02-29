@@ -26,7 +26,7 @@ contract RewardsDistribution {
 
     event EligibleUserAdded(address userAddress, uint256 entryNo);
     event TotalRewardUpdated(uint256 _from, uint256 _to);
-    event RewardSent(address[] indexed _user, uint256 _amount);
+    event RewardSent(address indexed _user, uint256 _amount);
     event UpdateGameAddress(address _newAddress);
 
     constructor(address _rewardsToken, uint256 _amountToDistribution) {
@@ -129,13 +129,12 @@ contract RewardsDistribution {
     }
 
     function _shareRewards(uint256 _reward) internal {
-        IERC20 _rewardContract = IERC20(gameAddress);
+        IERC20 _rewardContract = IERC20(rewardsToken);
 
         for (uint256 i = 0; i < eligibleUsers.length; i++) {
-            require(_rewardContract.transferFrom(owner, eligibleUsers[i], _reward), "could not send transaction");
+            require(_rewardContract.transfer(eligibleUsers[i], _reward), "could not send transaction");
 
-            // emit event for each transfer
+            emit RewardSent(eligibleUsers[i], _reward);
         }
-            emit RewardSent(eligibleUsers, _reward);
     }
 }
