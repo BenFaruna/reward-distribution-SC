@@ -61,7 +61,7 @@ contract RewardsDistribution is VRFv2Consumer {
             revert Errors.USER_NOT_REGISTERED();
         }
 
-        if ((eligibleUsers.length < entryToDistribution) && isActive) {
+        if (isActive) {
             if (!isEligible[_user]) {
                 isEligible[_user] = true;
                 eligibleUsers.push(_user);
