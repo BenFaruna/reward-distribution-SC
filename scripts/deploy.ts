@@ -32,8 +32,8 @@ async function main() {
 
   console.log(
     `RewardToken deployed to ${rewardToken.target}\n
-    RewardDistributor deployed to ${rewardDistributor.target}\n
-    RewardGame deployed to ${rewardGame.target}`
+RewardDistributor deployed to ${rewardDistributor.target}\n
+RewardGame deployed to ${rewardGame.target}`
   );
 }
 
