@@ -12,7 +12,7 @@ async function main() {
   const rewardToken = await ethers.deployContract("RewardToken");
   await rewardToken.waitForDeployment();
 
-  const rewardDistributor = await ethers.deployContract("RewardDistributor", [rewardToken.target,
+  const rewardDistributor = await ethers.deployContract("RewardsDistribution", [rewardToken.target,
     userBeforeDistribution, subscriptionId]);
 
   await rewardDistributor.waitForDeployment();
