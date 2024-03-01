@@ -1,21 +1,39 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
 
-  const lockedAmount = ethers.parseEther("0.001");
+  const [deployer] = await ethers.getSigners();
 
-  const lock = await ethers.deployContract("Lock", [unlockTime], {
-    value: lockedAmount,
-  });
+  const userBeforeDistribution = 10;
+  const subscriptionId = process.env.SUBSCRIPTION_ID;
+  const rewardAmount = ethers.parseUnits("100000", 18);
+  
 
-  await lock.waitForDeployment();
+  const rewardToken = await ethers.deployContract("RewardToken");
+  await rewardToken.waitForDeployment();
+
+  const rewardDistributor = await ethers.deployContract("RewardDistributor", [rewardToken.target,
+    userBeforeDistribution, subscriptionId]);
+
+  await rewardDistributor.waitForDeployment();
+
+  const rewardGame = await ethers.deployContract("RewardGame", [rewardDistributor.target]);
+  await rewardGame.waitForDeployment();
+
+
+  const transferTx = await rewardToken.connect(deployer).transfer(rewardDistributor.target, rewardAmount);
+  transferTx.wait();
+
+  const setRewardGameTx = await rewardDistributor.connect(deployer).setGameAddress(rewardGame.target);
+  setRewardGameTx.wait();
+
+  const setRewardAmountTx = await rewardDistributor.connect(deployer).changeTotalReward(rewardAmount);
+  setRewardAmountTx.wait();
 
   console.log(
-    `Lock with ${ethers.formatEther(
-      lockedAmount
-    )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.target}`
+    `RewardToken deployed to ${rewardToken.target}\n
+    RewardDistributor deployed to ${rewardDistributor.target}\n
+    RewardGame deployed to ${rewardGame.target}`
   );
 }
 
